@@ -1,4 +1,4 @@
-package com.senac.deskdoc;
+package com.senac.deskdocs;
 
 
 import java.io.Serializable;

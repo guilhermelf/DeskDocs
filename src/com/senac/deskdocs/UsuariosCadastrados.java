@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.senac.deskdoc;
+package com.senac.deskdocs;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -33,7 +33,7 @@ public class UsuariosCadastrados extends UnicastRemoteObject implements IUsuario
         }
         if(novo) {
             this.usuarios.add(usuario);
-            System.out.println("Usuário: " + usuario.getEmail() + " cadastrado com sucesso!");
+            System.out.println("Usuário: " + usuario.getNome() + ", e-mail " + usuario.getEmail() + ", e senha " + usuario.getSenha() + " cadastrado com sucesso!");
             
             return novo;
         } else {
@@ -45,11 +45,10 @@ public class UsuariosCadastrados extends UnicastRemoteObject implements IUsuario
     public Usuario logar(String email, String senha) throws RemoteException {
         Usuario usuario = null;
         
-        System.out.println(email + " - " + senha);
-        
         for (Usuario user: usuarios) {           
             if(email.equalsIgnoreCase(user.getEmail()) && senha.equals(user.getSenha())) {
                 usuario = user;
+                System.out.println("Usuário: " + usuario.getNome() + " (e-mail " + usuario.getEmail() + ") logado com sucesso!");
                 break;
             }
         }       

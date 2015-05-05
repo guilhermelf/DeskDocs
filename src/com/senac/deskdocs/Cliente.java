@@ -1,6 +1,6 @@
-package com.senac.deskdoc;
+package com.senac.deskdocs;
 
-import com.senac.deskdoc.gui.JanelaInicial;
+import com.senac.deskdocs.gui.JanelaInicial;
 import static java.lang.System.exit;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
@@ -106,5 +106,21 @@ public class Cliente {
     
     public static void sair() {
         exit(0);
-    }    
+    }  
+
+    public static Usuario getUsuario() {
+        return usuario;
+    }
+
+    public static void setUsuario(Usuario usuario) {
+        Cliente.usuario = usuario;
+    }
+
+    public static Documento getDocumento() {
+        return documento;
+    }
+
+    public static void setDocumento(Documento documento) {
+        Cliente.documento = documento;
+    } 
 }
