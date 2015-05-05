@@ -41,7 +41,7 @@ public class JanelaEditor extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem4 = new javax.swing.JMenuItem();
+        botaoCompartilhar = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         jMenuItem5 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -54,6 +54,11 @@ public class JanelaEditor extends javax.swing.JFrame {
         txt_conteudo.setColumns(20);
         txt_conteudo.setRows(5);
         txt_conteudo.setEnabled(false);
+        txt_conteudo.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txt_conteudoKeyPressed(evt);
+            }
+        });
         jScrollPane1.setViewportView(txt_conteudo);
 
         jMenu3.setText("Arquivo");
@@ -76,8 +81,14 @@ public class JanelaEditor extends javax.swing.JFrame {
         });
         jMenu3.add(jMenuItem1);
 
-        jMenuItem4.setText("Compartilhar");
-        jMenu3.add(jMenuItem4);
+        botaoCompartilhar.setText("Compartilhar");
+        botaoCompartilhar.setEnabled(false);
+        botaoCompartilhar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botaoCompartilharActionPerformed(evt);
+            }
+        });
+        jMenu3.add(botaoCompartilhar);
         jMenu3.add(jSeparator2);
 
         jMenuItem5.setText("Mudar usuário");
@@ -127,10 +138,14 @@ public class JanelaEditor extends javax.swing.JFrame {
             abrir.listarDocumentos(docs);
             abrir.setVisible(rootPaneCheckingEnabled);
             
-            String teste = abrir.getNomeDocumento();
+            String nome = abrir.getNomeDocumento();
             
-            if(teste != null) {
-                JOptionPane.showMessageDialog(null, teste);
+            if(nome != null) {               
+                Documento doc = Cliente.buscarDocumento(nome);
+                this.setTitle(doc.getNome() + " - DeskDocs");
+                this.txt_conteudo.setText(doc.getTexto().getTexto());
+                this.txt_conteudo.setEnabled(true);
+                this.botaoCompartilhar.setEnabled(true);
             }
         } else {
             JOptionPane.showMessageDialog(null, "Esse usuário, não possui arquivos!");
@@ -145,6 +160,7 @@ public class JanelaEditor extends javax.swing.JFrame {
             this.txt_conteudo.setEnabled(rootPaneCheckingEnabled);
         
             this.setTitle(nome + " - DeskDocs");
+            this.botaoCompartilhar.setEnabled(true);
         } else {
             JOptionPane.showMessageDialog(null, "Impossível criar o arquivo, usuário já possui documento com esse nome!");
         }
@@ -160,6 +176,27 @@ public class JanelaEditor extends javax.swing.JFrame {
         
         this.dispose();
     }//GEN-LAST:event_jMenuItem5ActionPerformed
+
+    private void botaoCompartilharActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoCompartilharActionPerformed
+        List<Documento> docs = Cliente.buscarDocumentos();
+        
+        if(docs != null) {
+        
+            String nome = JOptionPane.showInputDialog("Digite o e-mail do usuário com quem deseja compartilhar:");
+
+            if(Cliente.compartilharDocumento(nome)) {
+                JOptionPane.showMessageDialog(null, "Documento compartilhado com sucesso!");
+            } else {
+                JOptionPane.showMessageDialog(null, "Erro ao compartilhar o documento!");
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Esse usuário, não possui arquivos para compartilhar!");
+        }
+    }//GEN-LAST:event_botaoCompartilharActionPerformed
+
+    private void txt_conteudoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_conteudoKeyPressed
+        Cliente.salvarDocumento(this.txt_conteudo.getText());
+    }//GEN-LAST:event_txt_conteudoKeyPressed
 
     /**
      * @param args the command line arguments
@@ -205,13 +242,13 @@ public class JanelaEditor extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem botaoCompartilhar;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar2;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JScrollPane jScrollPane1;

@@ -104,6 +104,23 @@ public class Cliente {
         }
     } 
     
+    public static boolean compartilharDocumento(String email) {
+        try {                
+            return stub.compartilharDocumento(Cliente.documento, Cliente.usuario, email);
+        } catch (RemoteException ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }     
+    }
+    
+    public static void salvarDocumento(String texto) {
+        try {                
+            stub.salvarDocumento(Cliente.documento, Cliente.usuario, texto);
+        } catch (RemoteException ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+    }
+    
     public static void sair() {
         exit(0);
     }  

@@ -115,7 +115,28 @@ public class UsuariosCadastrados extends UnicastRemoteObject implements IUsuario
     }
 
     @Override
-    public boolean compartilharDocumento(Documento documento, String email) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean compartilharDocumento(Documento documento, Usuario proprietario, String email) throws RemoteException {
+        
+        Usuario compartilhado = buscarUsuario(email);
+        
+        if(compartilhado != null) {
+            Usuario usuario = buscarUsuario(proprietario.getEmail());
+            Documento doc = buscarDocumento(documento.getNome(), usuario);
+            
+            compartilhado.getDocumentos().add(doc);
+            
+            System.out.println("Documento: " + doc.getNome() + " do usuário " + usuario.getNome() + " foi compartilhado com o usuário " + compartilhado.getNome());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public void salvarDocumento(Documento documento, Usuario proprietario, String texto) throws RemoteException {
+        Usuario usuario = buscarUsuario(proprietario.getEmail());
+        Documento doc = buscarDocumento(documento.getNome(), proprietario);
+        
+        doc.getTexto().setTexto(texto);
     }
 }
