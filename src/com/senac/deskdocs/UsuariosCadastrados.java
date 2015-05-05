@@ -33,7 +33,7 @@ public class UsuariosCadastrados extends UnicastRemoteObject implements IUsuario
         }
         if(novo) {
             this.usuarios.add(usuario);
-            System.out.println("Usuário: " + usuario.getNome() + ", e-mail " + usuario.getEmail() + ", e senha " + usuario.getSenha() + " cadastrado com sucesso!");
+            System.out.println("Usuário: " + usuario.getNome() + ", e-mail " + usuario.getEmail() + " e senha " + usuario.getSenha() + " cadastrado com sucesso!");
             
             return novo;
         } else {
@@ -75,6 +75,9 @@ public class UsuariosCadastrados extends UnicastRemoteObject implements IUsuario
         
         List<Documento> documentos = user.getDocumentos();
         
+        if(documentos.isEmpty())
+            return null;
+        
         return documentos;
     }
 
@@ -83,19 +86,28 @@ public class UsuariosCadastrados extends UnicastRemoteObject implements IUsuario
         Documento doc = new Documento(nome);        
         
         Usuario user = buscarUsuario(usuario.getEmail());
-        user.getDocumentos().add(doc);       
         
-        System.out.println("Documento " + doc.getNome() + " criado.");
+        for(Documento documento: user.getDocumentos()) {
+            if(documento.getNome().equalsIgnoreCase(doc.getNome())) {
+                doc = null;
+                break;
+            }
+        }
+        if(doc != null) {
+            user.getDocumentos().add(doc);
+            System.out.println("Documento " + doc.getNome() + " criado.");
+        }       
+        
         return doc;
     } 
 
     @Override
-    public Documento buscarDocumento(Documento documento, Usuario usuario) throws RemoteException {
+    public Documento buscarDocumento(String nomeDocumento, Usuario usuario) throws RemoteException {
         Usuario user = buscarUsuario(usuario.getEmail());
         
         List<Documento> documentos = user.getDocumentos();
         for (Documento temp : documentos) {
-            if(temp.getNome().equalsIgnoreCase(documento.getNome())) {
+            if(temp.getNome().equalsIgnoreCase(nomeDocumento)) {
                 return temp;
             }
         }       

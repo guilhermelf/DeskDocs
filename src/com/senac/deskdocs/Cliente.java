@@ -94,9 +94,9 @@ public class Cliente {
         }
     }
     
-    public static Documento buscarDocumento(Documento documento) {
+    public static Documento buscarDocumento(String nomeDocumento) {
         try {       
-            return stub.buscarDocumento(documento, Cliente.usuario);
+            return stub.buscarDocumento(nomeDocumento, Cliente.usuario);
         
         } catch (RemoteException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);

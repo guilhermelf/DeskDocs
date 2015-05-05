@@ -132,7 +132,12 @@ public class JanelaLogar extends javax.swing.JFrame {
         Usuario usuario = Cliente.logar(txt_email.getText(), pw_senha.getText());
         if(usuario != null) {
             Cliente.setUsuario(usuario);
-            JOptionPane.showMessageDialog(null, "Usuário logado com sucesso!");            
+            JOptionPane.showMessageDialog(null, "Usuário logado com sucesso!");
+            
+            JanelaEditor editor = new JanelaEditor();
+            editor.setVisible(rootPaneCheckingEnabled);
+            
+            this.dispose();    
         } else {
             JOptionPane.showMessageDialog(null, "Usuário e/ou senha inválidos, tente novamente!");    
         }
