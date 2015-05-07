@@ -29,4 +29,5 @@ public interface IUsuariosCadastrados extends Remote{
     public Documento criarDocumento(Usuario usuario, String nome) throws RemoteException;
     public boolean compartilharDocumento(Documento documento, Usuario proprietario, String email) throws RemoteException;
     public void salvarDocumento(Documento documento, Usuario proprietario, String texto) throws RemoteException;
+    public Documento atualizarDocumento(Documento documento, Usuario usuario) throws RemoteException;
 }

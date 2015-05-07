@@ -123,10 +123,16 @@ public class UsuariosCadastrados extends UnicastRemoteObject implements IUsuario
             Usuario usuario = buscarUsuario(proprietario.getEmail());
             Documento doc = buscarDocumento(documento.getNome(), usuario);
             
-            compartilhado.getDocumentos().add(doc);
+            for (Documento doc2: compartilhado.getDocumentos()) {
+                if(doc2.getNome().equalsIgnoreCase(doc.getNome())) {
+                    return false;
+                }
+            }
             
+            compartilhado.getDocumentos().add(doc);
             System.out.println("Documento: " + doc.getNome() + " do usuário " + usuario.getNome() + " foi compartilhado com o usuário " + compartilhado.getNome());
             return true;
+            
         } else {
             return false;
         }
@@ -134,9 +140,23 @@ public class UsuariosCadastrados extends UnicastRemoteObject implements IUsuario
 
     @Override
     public void salvarDocumento(Documento documento, Usuario proprietario, String texto) throws RemoteException {
-        Usuario usuario = buscarUsuario(proprietario.getEmail());
-        Documento doc = buscarDocumento(documento.getNome(), proprietario);
+        Usuario usuario = buscarUsuario(proprietario.getEmail());    
+        Documento doc = buscarDocumento(documento.getNome(), usuario);   
+        doc.setTexto(texto);
+    }
+
+    @Override
+    public Documento atualizarDocumento(Documento documento, Usuario usuario) throws RemoteException {
+        Usuario user = buscarUsuario(usuario.getEmail());
+        Documento doc = buscarDocumento(documento.getNome(), usuario);
         
-        doc.getTexto().setTexto(texto);
+        List<Documento> documentos = user.getDocumentos();
+        for (Documento temp : documentos) {
+            if(temp.getNome().equalsIgnoreCase(doc.getNome())) {
+                System.out.println("Cliente: " + usuario.getNome() + " recebeu o documento: " + documento.getNome() + " atualizado com sucesso!");
+                return temp;
+            }
+        }       
+        return null;
     }
 }

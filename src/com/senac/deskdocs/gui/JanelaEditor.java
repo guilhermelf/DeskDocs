@@ -5,11 +5,13 @@
  */
 package com.senac.deskdocs.gui;
 
+import com.senac.deskdocs.AtualizarDocumento;
 import com.senac.deskdocs.Cliente;
 import com.senac.deskdocs.Documento;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.text.Document;
 
 /**
@@ -17,7 +19,8 @@ import javax.swing.text.Document;
  * @author fraga
  */
 public class JanelaEditor extends javax.swing.JFrame {
-
+    private Thread t;
+    private boolean digitando = false;
     /**
      * Creates new form JanelaEditor
      */
@@ -36,7 +39,7 @@ public class JanelaEditor extends javax.swing.JFrame {
 
         jPopupMenu1 = new javax.swing.JPopupMenu();
         jScrollPane1 = new javax.swing.JScrollPane();
-        txt_conteudo = new javax.swing.JTextArea();
+        txtConteudo = new javax.swing.JTextArea();
         jMenuBar2 = new javax.swing.JMenuBar();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
@@ -51,15 +54,40 @@ public class JanelaEditor extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("DeskDocs");
 
-        txt_conteudo.setColumns(20);
-        txt_conteudo.setRows(5);
-        txt_conteudo.setEnabled(false);
-        txt_conteudo.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txt_conteudoKeyPressed(evt);
+        txtConteudo.setColumns(20);
+        txtConteudo.setLineWrap(true);
+        txtConteudo.setRows(5);
+        txtConteudo.setWrapStyleWord(true);
+        txtConteudo.setEnabled(false);
+        txtConteudo.addCaretListener(new javax.swing.event.CaretListener() {
+            public void caretUpdate(javax.swing.event.CaretEvent evt) {
+                txtConteudoCaretUpdate(evt);
             }
         });
-        jScrollPane1.setViewportView(txt_conteudo);
+        txtConteudo.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtConteudoFocusGained(evt);
+            }
+        });
+        txtConteudo.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+                txtConteudoCaretPositionChanged(evt);
+            }
+            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
+            }
+        });
+        txtConteudo.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtConteudoKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtConteudoKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtConteudoKeyTyped(evt);
+            }
+        });
+        jScrollPane1.setViewportView(txtConteudo);
 
         jMenu3.setText("Arquivo");
 
@@ -111,6 +139,14 @@ public class JanelaEditor extends javax.swing.JFrame {
         jMenuBar2.add(jMenu3);
 
         jMenu4.setText("Sobre");
+        jMenu4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jMenu4MousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jMenu4MouseReleased(evt);
+            }
+        });
         jMenuBar2.add(jMenu4);
 
         setJMenuBar(jMenuBar2);
@@ -143,9 +179,13 @@ public class JanelaEditor extends javax.swing.JFrame {
             if(nome != null) {               
                 Documento doc = Cliente.buscarDocumento(nome);
                 this.setTitle(doc.getNome() + " - DeskDocs");
-                this.txt_conteudo.setText(doc.getTexto().getTexto());
-                this.txt_conteudo.setEnabled(true);
+                this.txtConteudo.setText(doc.getTexto());
+                this.txtConteudo.setEnabled(true);
                 this.botaoCompartilhar.setEnabled(true);
+                
+                AtualizarDocumento at = new AtualizarDocumento(this);
+                this.t = new Thread(at);
+                this.t.start();
             }
         } else {
             JOptionPane.showMessageDialog(null, "Esse usuário, não possui arquivos!");
@@ -154,15 +194,24 @@ public class JanelaEditor extends javax.swing.JFrame {
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         String nome = JOptionPane.showInputDialog("Digite o nome do documento:");
-        Documento doc = Cliente.criarDocumento(nome);
         
-        if(doc != null) {
-            this.txt_conteudo.setEnabled(rootPaneCheckingEnabled);
-        
-            this.setTitle(nome + " - DeskDocs");
-            this.botaoCompartilhar.setEnabled(true);
-        } else {
-            JOptionPane.showMessageDialog(null, "Impossível criar o arquivo, usuário já possui documento com esse nome!");
+        if(nome != null) {
+            Documento doc = Cliente.criarDocumento(nome);
+
+            if(doc != null) {
+                this.txtConteudo.setEnabled(rootPaneCheckingEnabled); 
+                this.txtConteudo.setText("");          
+
+                this.setTitle(nome + " - DeskDocs");
+                this.botaoCompartilhar.setEnabled(true);
+
+                AtualizarDocumento at = new AtualizarDocumento(this);
+                this.t = new Thread(at);
+                this.t.start();
+
+            } else {
+                JOptionPane.showMessageDialog(null, "Impossível criar o arquivo, usuário já possui documento com esse nome!");
+            }
         }
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
@@ -183,20 +232,51 @@ public class JanelaEditor extends javax.swing.JFrame {
         if(docs != null) {
         
             String nome = JOptionPane.showInputDialog("Digite o e-mail do usuário com quem deseja compartilhar:");
-
-            if(Cliente.compartilharDocumento(nome)) {
-                JOptionPane.showMessageDialog(null, "Documento compartilhado com sucesso!");
-            } else {
-                JOptionPane.showMessageDialog(null, "Erro ao compartilhar o documento!");
+            if(nome != null) {
+                if(Cliente.compartilharDocumento(nome)) {
+                    JOptionPane.showMessageDialog(null, "Documento compartilhado com sucesso!");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Usuário não encontrado ou o usuário já possui arquivo com esse nome!");
+                }
             }
         } else {
             JOptionPane.showMessageDialog(null, "Esse usuário, não possui arquivos para compartilhar!");
         }
     }//GEN-LAST:event_botaoCompartilharActionPerformed
 
-    private void txt_conteudoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_conteudoKeyPressed
-        Cliente.salvarDocumento(this.txt_conteudo.getText());
-    }//GEN-LAST:event_txt_conteudoKeyPressed
+    private void txtConteudoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtConteudoKeyPressed
+        this.digitando = true;
+    }//GEN-LAST:event_txtConteudoKeyPressed
+
+    private void txtConteudoFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtConteudoFocusGained
+ 
+    }//GEN-LAST:event_txtConteudoFocusGained
+
+    private void txtConteudoCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtConteudoCaretUpdate
+            
+    }//GEN-LAST:event_txtConteudoCaretUpdate
+
+    private void txtConteudoCaretPositionChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_txtConteudoCaretPositionChanged
+
+    }//GEN-LAST:event_txtConteudoCaretPositionChanged
+
+    private void txtConteudoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtConteudoKeyTyped
+               
+    }//GEN-LAST:event_txtConteudoKeyTyped
+
+    private void txtConteudoKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtConteudoKeyReleased
+        Cliente.salvarDocumento(this.txtConteudo.getText());
+        this.digitando = false;
+    }//GEN-LAST:event_txtConteudoKeyReleased
+
+    private void jMenu4MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu4MouseReleased
+        
+    }//GEN-LAST:event_jMenu4MouseReleased
+
+    private void jMenu4MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu4MousePressed
+        JanelaSobre sobre = new JanelaSobre(this, true);
+        sobre.setVisible(true);        
+    }//GEN-LAST:event_jMenu4MousePressed
 
     /**
      * @param args the command line arguments
@@ -234,13 +314,29 @@ public class JanelaEditor extends javax.swing.JFrame {
     }
     
     public String getConteudo() {  
-        return txt_conteudo.getText();
+        return txtConteudo.getText();
     }
     
     public void setConteudo(String conteudo) {
-        txt_conteudo.setText(conteudo);
+        txtConteudo.setText(conteudo);
     }
 
+    public JTextArea getTxt_conteudo() {
+        return txtConteudo;
+    }
+
+    public void setTxt_conteudo(JTextArea txtConteudo) {
+        this.txtConteudo = txtConteudo;
+    }
+
+    public boolean isDigitando() {
+        return digitando;
+    }
+
+    public void setDigitando(boolean digitando) {
+        this.digitando = digitando;
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem botaoCompartilhar;
     private javax.swing.JMenu jMenu3;
@@ -254,6 +350,6 @@ public class JanelaEditor extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
-    private javax.swing.JTextArea txt_conteudo;
+    private javax.swing.JTextArea txtConteudo;
     // End of variables declaration//GEN-END:variables
 }

@@ -12,28 +12,29 @@ import java.io.Serializable;
  * @author fraga
  */
 public class Documento implements Serializable{
-    private Texto texto;
+    private String texto;
     private String nome;
     
     public Documento() {
+        this.texto = "";
     }
     
     public Documento(String nome) {
-        texto = new Texto();
-        texto.setTexto("");
         this.nome = nome;
+        this.texto = "";
     }
     
     public Documento(String nome, String texto) {
-        this.texto = new Texto(texto);
+        this.texto = texto;
         this.nome = nome;
+
     }
 
-    public Texto getTexto() {
+    public String getTexto() {
         return texto;
     }
 
-    public void setTexto(Texto texto) {
+    public void setTexto(String texto) {
         this.texto = texto;
     }
 
@@ -44,4 +45,5 @@ public class Documento implements Serializable{
     public void setNome(String nome) {
         this.nome = nome;
     } 
+
 }

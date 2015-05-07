@@ -23,33 +23,7 @@ public class Cliente {
             stub = (IUsuariosCadastrados) Naming.lookup("Usuarios");
             
             JanelaInicial inicial = new JanelaInicial();
-            inicial.setVisible(true);
-
-            
-
-//            if(cadastrar("teste@teste", "1234", "nome")) {
-//                System.out.println("Usuário cadastrado com sucesso!");
-//            } else {
-//                System.out.println("Erro, esse e-mail já foi cadastrado!");
-//            }
-//            
-//            Usuario usr = logar("teste@teste", "1234");          
-//            
-//            if(usr == null) {
-//                System.out.println("Usuário não encontrado!");
-//            } else {
-//                Cliente.usuario = usr;
-//                System.out.println(usuario.getNome() + " logado com sucesso!");
-//            }
-//            
-//            Documento doc = criarDocumento("Bostinha");
-//            
-//            List<Documento> docs = buscarDocumentos();
-//            System.out.println("Lista de documentos: " + docs.toString());
-//            
-//            Documento doc2 = buscarDocumento(docs.get(0));
-//            System.out.println("Documento de nome: " + doc2.getNome() + " de conteudo: " + doc2.getTexto().getTexto() + " retornado com sucesso!");
-//            
+            inicial.setVisible(true);         
        
         } catch (NotBoundException | MalformedURLException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
@@ -66,8 +40,9 @@ public class Cliente {
     }
     
     public static Usuario logar(String email, String senha) {
-        try {                
-            return stub.logar(email, senha);
+        try {      
+            Cliente.usuario = stub.logar(email, senha);
+            return Cliente.usuario;
         } catch (RemoteException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
             return null;
@@ -86,8 +61,9 @@ public class Cliente {
     
     public static Documento criarDocumento(String nome) {
         try {
-            Cliente.documento = stub.criarDocumento(Cliente.usuario, nome);
-            return Cliente.documento;
+            Documento doc = stub.criarDocumento(Cliente.usuario, nome);
+            Cliente.documento = doc;          
+            return doc;
         } catch (RemoteException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
             return null;
@@ -119,6 +95,18 @@ public class Cliente {
         } catch (RemoteException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
         } 
+    }
+    
+    public static Documento atualizarDocumento() {
+        try {       
+            Documento doc = stub.atualizarDocumento(Cliente.documento, Cliente.usuario);
+            Cliente.documento = doc;
+            return doc;
+        
+        } catch (RemoteException ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+            return null;    
+        }
     }
     
     public static void sair() {
